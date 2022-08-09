@@ -1,23 +1,21 @@
-from typing import Any
 from tinydb import TinyDB, Query
+from constants import VALUE_KEY, DATE_KEY
 
-from oxr import OXR
 
 class DB:
-    def __init__(self, file_name: str, api: OXR) -> None:
-        self.db = TinyDB(file_name)
-        self.api = api
+    def __init__(self, file_name: str) -> None:
+        self.__db = TinyDB(file_name)
 
     def store_historical_data(self, date: str, value) -> None:
-        self.db.insert({ 'date': date, 'value': value })
+        Record = Query()
+        self.__db.upsert({DATE_KEY: date, VALUE_KEY: value},
+                         Record.date == date)
 
     def get_historical_value(self, date: str):
-        query = Query()
-        res = self.db.search(query.date == date)
-        if not res:
-            api_res = self.api.get_historical_data(date)
-            new_value = api_res['value']
-            self.store_historical_data(date, new_value)
-            return new_value
+        Record = Query()
+        # Returns first occurence only
+        res = self.__db.get(Record.date == date)
+        if res:
+            return res[DATE_KEY]
         else:
-            return res[0]['value']
+            return None
