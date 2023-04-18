@@ -1,6 +1,5 @@
 import asyncio
 import os
-import time
 from dotenv import load_dotenv
 import schedule
 from dolar_bot import DolarBot
@@ -25,14 +24,11 @@ async def main():
     if use_scheduler:
         print('Using scheduler. Running every 10 minutes during work days.')
 
-        loop = asyncio.get_event_loop()
-        schedule.every(10).minutes.do(lambda: asyncio.ensure_future(bot.check))
-
         while True:
-            # Spinning to avoid thread locking
-            await asyncio.sleep(1)
+            # Sleep
+            await asyncio.sleep(60 * 1)
             # Executa a task
-            await loop.run_in_executor(None, schedule.run_pending)
+            await bot.check()
     else:
         print('Single time check.')
         await bot.check()

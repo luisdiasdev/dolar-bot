@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  dolarbot:
+    image: dolarbot
+    build:
+      context: .
+      dockerfile: ./Dockerfile

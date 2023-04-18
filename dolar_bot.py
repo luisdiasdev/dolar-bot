@@ -1,4 +1,4 @@
-from time import sleep, time
+from time import time
 
 import telegram
 from constants import DATE_FORMAT, VALUE_KEY, DATE_KEY
