@@ -51,25 +51,21 @@ class DolarStatusChecker:
         self.__threshold = threshold
 
     def check(self) -> str | None:
-        # if not is_work_day() or not is_work_hour():
-        #     print('Not working hour. Skipping')
-        #     return
+        if not is_work_day() or not is_work_hour():
+            print('Not working hour. Skipping')
+            return
 
-        # Flow
-        # 1. Grab last day value from Database
-        # 2. If not found, grab from API and store in Database
-        # 3. Grab current value
-        # 4. Store current value in another table
         last_day = get_last_day()
-        last_value = self.__db.get_historical_data(last_day)
-        if last_value is None:
+        last_day_value = self.__db.get_historical_data(last_day)
+
+        if last_day_value is None:
             print('Cotação do dia anterior não encontrada, buscando na API...')
             res = self.__api.get_historical_data(last_day)
-            last_value = res[VALUE_KEY]
+            last_day_value = res[VALUE_KEY]
             print(
-                f'Cotação do dia anterior R${last_value}. Salvando localmente.'
+                f'Cotação do dia anterior R${last_day_value}. Salvando localmente.'
             )
-            self.__db.save_historical_data(date=last_day, value=last_value)
+            self.__db.save_historical_data(date=last_day, value=last_day_value)
 
         last_stored_value = self.__db.get_last_stored_value()
         if last_stored_value is None:
@@ -79,6 +75,10 @@ class DolarStatusChecker:
             existing_date_header = last_stored_value[DATE_HEADER_KEY]
             latest_data = self.__api.get_latest_data(existing_etag,
                                                      existing_date_header)
+            if existing_etag == latest_data[ETAG_KEY] or last_stored_value[
+                    VALUE_KEY] == latest_data[VALUE_KEY]:
+                print(f'Sem modificação no ETag/Cotação, ignorando.')
+                return
 
         etag = latest_data[ETAG_KEY]
         date_header = latest_data[DATE_HEADER_KEY]
@@ -88,14 +88,14 @@ class DolarStatusChecker:
                                      current_value)
 
         # Actual calculation
-        diff = percentage_diff(last_value, current_value)
-        diff_value = round(abs(last_value - current_value), 2)
+        diff = percentage_diff(last_day_value, current_value)
+        diff_value = round(abs(last_day_value - current_value), 2)
         current_value_round = round(current_value, 2)
         if diff < self.__threshold:
             return f'Ainda não foi dessa vez. Cotação atual: R${current_value_round} - Variação: R${diff_value} ({diff}%)'
 
         print(
-            f'Diff maior que {self.__threshold}%\n\tValor antigo: R${last_value}\n\tValor atual: R${current_value_round}\n\tDiff em R${diff_value}'
+            f'Diff maior que {self.__threshold}%\n\tValor antigo: R${last_day_value}\n\tValor atual: R${current_value_round}\n\tDiff em R${diff_value}'
         )
 
         return f'Atenção! A cotação do dólar subiu em relação ao dia anterior! Cotação atual: R${current_value_round} - Variação: R${diff_value} ({diff}%)'
