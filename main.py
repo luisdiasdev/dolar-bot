@@ -16,8 +16,8 @@ use_mock_api = os.getenv('USE_MOCK_OXR_API', 'False').lower() in ('true', '1')
 oxr_app_id = os.getenv('OXR_APP_ID')
 telegram_token = os.getenv('TELEGRAM_TOKEN', '')
 telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
-interval_minutes = get_int_from_env('RUN_INTERVAL', 25)
-diff_threshold = get_int_from_env('DIFF_THRESHOLD', 1)
+interval_minutes = get_int_from_env('RUN_INTERVAL', '25')
+diff_threshold = get_int_from_env('DIFF_THRESHOLD', '1')
 
 bot = DolarStatusChecker(
     threshold=diff_threshold,  # Porcentagem de aumento
