@@ -1,7 +1,6 @@
 import json
 from oxr import OXR
-from datetime import datetime
-from constants import DATE_FORMAT, DATE_HEADER_KEY, DATE_KEY, ETAG_KEY, TIMESTAMP_KEY, VALUE_KEY
+from constants import DATE_HEADER_KEY, DATE_KEY, ETAG_KEY, TIMESTAMP_KEY, VALUE_KEY
 
 
 class MockOXR(OXR):

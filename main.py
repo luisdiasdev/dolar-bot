@@ -1,20 +1,26 @@
-import asyncio
 import os
 from dotenv import load_dotenv
-import schedule
 from dolar_status_checker import DolarStatusChecker
 from telegram.ext import Application, CallbackContext
 
 load_dotenv()
 
-use_scheduler = os.getenv('USE_SCHEDULER', 'False').lower() in ('true', '1')
+def get_int_from_env(env_name, default_value=None):
+    env_var_value = os.getenv(env_name, default=default_value)
+    if env_var_value is None or not env_var_value.isdigit():
+        raise ValueError(f"Environment variable '{env_name}' is not present or not a numeric value.")
+
+    return int(env_var_value)
+
 use_mock_api = os.getenv('USE_MOCK_OXR_API', 'False').lower() in ('true', '1')
 oxr_app_id = os.getenv('OXR_APP_ID')
 telegram_token = os.getenv('TELEGRAM_TOKEN', '')
 telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
+interval_minutes = get_int_from_env('RUN_INTERVAL', 25)
+diff_threshold = get_int_from_env('DIFF_THRESHOLD', 1)
 
 bot = DolarStatusChecker(
-    threshold=5,  # Porcentagem de aumento
+    threshold=diff_threshold,  # Porcentagem de aumento
     use_mock_api=use_mock_api,  # Avoid calling real API for testing
     oxr_app_id=oxr_app_id)
 
@@ -27,23 +33,9 @@ def main():
     application = Application.builder().token(telegram_token).build()
 
     if application.job_queue is not None:
-        application.job_queue.run_repeating(check_status, interval=60, first=0)
+        application.job_queue.run_repeating(check_status, interval=60 * interval_minutes, first=0)
 
     application.run_polling()
-
-    # if use_scheduler:
-    #     loop = asyncio.get_event_loop()
-    #     loop.run_until_complete
-    #     print('Using scheduler. Running every 10 minutes during work days.')
-
-    #     while True:
-    #         # Sleep
-    #         await asyncio.sleep(60 * 1)
-    #         # Executa a task
-    #         await bot.check()
-    # else:
-    #     print('Single time check.')
-    #     await bot.check()
 
 
 if __name__ == '__main__':
