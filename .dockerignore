@@ -3,7 +3,6 @@
 **/.classpath
 **/.dockerignore
 !**/.env
-**/.env.*
 **/.git
 **/.gitignore
 **/.project

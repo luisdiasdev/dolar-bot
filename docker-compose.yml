@@ -6,3 +6,10 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
+    volumes:
+      - dolarbot-data:/app/data
+    env_file:
+      - .env
+
+volumes:
+  dolarbot-data:
