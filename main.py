@@ -2,7 +2,9 @@ import os
 from dotenv import load_dotenv
 from dolar_status_checker import DolarStatusChecker
 from telegram.ext import Application, CallbackContext
+import logging
 
+# Environment variables
 load_dotenv()
 
 def get_int_from_env(env_name, default_value=None):
@@ -19,14 +21,25 @@ telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID')
 interval_minutes = get_int_from_env('RUN_INTERVAL', '25')
 diff_threshold = get_int_from_env('DIFF_THRESHOLD', '1')
 
+# Logging Setup
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+
+logger = logging.getLogger(__name__)
+
+# Initialize Status Checker
 bot = DolarStatusChecker(
     threshold=diff_threshold,  # Porcentagem de aumento
     use_mock_api=use_mock_api,  # Avoid calling real API for testing
     oxr_app_id=oxr_app_id)
 
+# Callback
 async def check_status(context: CallbackContext):
+    logger.info("Checking status.")
     result = bot.check()
     if result is not None:
+        logger.info("Sending telegram message.")
         await context.bot.send_message(chat_id=telegram_chat_id, text=result)
 
 def main():
