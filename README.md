@@ -2,19 +2,17 @@
 
 ## Objective
 
-Open Google with "dolar hoje" search when:
-
-- Current USD/BRL rate is up by at least 5% compared to the previous day
+Get notified on Telegram throughout the day if USD/BRL rate is up/down by at least a given threshold (defaults to 1%) compared to the last day.
 
 ## Technical Details
 
 - Use OpenExchangeRates API (free tier)
 - Limited to 1.000 requests/month (need to use it wisely)
-  - 1000 requests / 22 working days = 45.45 requests/day
-  - 45.45 requests / day = **5.68 requests / hour** (considering 8 hour work period)
-  - 45 requests/day - 1 to grab the historical data (consider storing everything from the API into a DB)
-  - 44 requests/8 hours = 5.5/hour
-  - 1 request per 15 minutes = 4 requests/hour = 32 requests/day
-
-- Previous Day
+  - Estimated usage:
+    - 10 hours/day - check every 45 minutes
+    - 600/45 = 13,333 requests per day
+    - 14 requests * 22 working days (approx.) = 308 requests on avg
+    - If you change the schedule interval, it'll require more API calls
+- Only runs during working days & hours (Mon-Fri - 9am-7pm)
   - If it was on Weekend (Saturday/Sunday) - compare with Friday instead
+- Checks historical value (last day) to compare against.
