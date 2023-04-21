@@ -1,4 +1,5 @@
 from time import time
+from zoneinfo import ZoneInfo
 
 from constants import DATE_FORMAT, DATE_HEADER_KEY, ETAG_KEY, TIMESTAMP_KEY, VALUE_KEY, DATE_KEY
 from database import DB
@@ -9,30 +10,26 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
+timezone = ZoneInfo(key="America/Sao_Paulo")
 
 # Checks if today is a workday (Mon-Fri)
-def is_work_day():
-    today = date.today().weekday()
-    return today < 5
-
+def is_work_day(weekday):
+    return weekday < 5
 
 # Checks if now is a workhour (9-19)
-def is_work_hour():
-    current_time = datetime.now().time()
-    hour = current_time.hour
+def is_work_hour(hour):
     return hour >= 9 and hour < 19
 
 
-def get_last_day():
-    weekend_threshold = get_weekend_threshold()
-    last_day = (date.today() -
+def get_last_day(now: datetime):
+    weekend_threshold = get_weekend_threshold(now.date().weekday())
+    last_day = (now.date() -
                 timedelta(days=weekend_threshold)).strftime(DATE_FORMAT)
     return last_day
 
 
-def get_weekend_threshold():
-    today = date.today().weekday()
-    if today == 6:  # Sunday
+def get_weekend_threshold(weekday):
+    if weekday == 6:  # Sunday
         return 2
     else:  # Saturday
         return 1
@@ -54,11 +51,12 @@ class DolarStatusChecker:
         self.__threshold = threshold
 
     def check(self) -> str | None:
-        if not is_work_day() or not is_work_hour():
+        now = datetime.now(tz=timezone)
+        if not is_work_day(now.date().weekday()) or not is_work_hour(now.time().hour):
             logger.info('Not a working hour. Skipping execution.')
             return
 
-        last_day = get_last_day()
+        last_day = get_last_day(now)
         last_day_value = self.__db.get_historical_data(last_day)
 
         if last_day_value is None:
