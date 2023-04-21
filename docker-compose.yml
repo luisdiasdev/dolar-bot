@@ -2,6 +2,7 @@ version: '3.4'
 
 services:
   dolarbot:
+    container_name: dolarbot
     image: dolarbot
     build:
       context: .
