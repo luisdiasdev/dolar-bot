@@ -3,7 +3,7 @@ from zoneinfo import ZoneInfo
 
 from constants import DATE_FORMAT, DATE_HEADER_KEY, ETAG_KEY, TIMESTAMP_KEY, VALUE_KEY, DATE_KEY
 from database import DB
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from oxr import OXR
 from mock_oxr import MockOXR
 from logging import getLogger
