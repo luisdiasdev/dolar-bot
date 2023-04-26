@@ -1,0 +1,10 @@
+pt:
+  checking_status: Verificando status...
+  sending_message: Enviando mensagem no Telegram.
+  not_working_day_hour: Não é um dia/hora válida. Ignorando execução.
+  last_day_not_found_locally: Cotação do dia anterior não encontrada, buscando na API...
+  saving_last_day_locally: Cotação do dia anterior R$%{value}. Salvando localmente.
+  no_data_stored_locally: Sem dados armazenados, buscando da API...
+  etag_or_rate_not_changed: Sem modificação no ETag ou Cotação anterior. Ignorando execução.
+  change_not_over_threshold: 'Cotação atual ainda não alterou mais de %{threshold}%: R$%{current} - Variação: R$%{diff_value} (%{diff_percent}%)'
+  change_over_threshold: 'Atenção! A cotação do dólar alterou mais de %{threshold}% em relação ao dia anterior! Cotação do dia anterior: R$%{last_value}. Cotação atual: R$%{current_value} - Variação: R$%{diff_value} (%{diff_percent}%)'

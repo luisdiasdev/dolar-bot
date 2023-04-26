@@ -1,6 +1,4 @@
-from time import time
-from zoneinfo import ZoneInfo
-
+import i18n
 from constants import DATE_FORMAT, DATE_HEADER_KEY, ETAG_KEY, TIMESTAMP_KEY, VALUE_KEY, DATE_KEY
 from database import DB
 from datetime import datetime, timedelta
@@ -10,11 +8,11 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
-timezone = ZoneInfo(key="America/Sao_Paulo")
 
 # Checks if today is a workday (Mon-Fri)
 def is_work_day(weekday):
     return weekday < 5
+
 
 # Checks if now is a workhour (9-19)
 def is_work_hour(hour):
@@ -51,27 +49,27 @@ class DolarStatusChecker:
         self.__threshold = threshold
 
     def check(self) -> str | None:
-        now = datetime.now(tz=timezone)
-        logger.info('Current date: %s', now)
-        if not is_work_day(now.date().weekday()) or not is_work_hour(now.time().hour):
-            logger.info('Not a working hour. Skipping execution.')
+        now = datetime.now()
+        logger.debug('Current date: %s', now)
+        if not is_work_day(now.date().weekday()) or not is_work_hour(
+                now.time().hour):
+            logger.info(i18n.t('not_working_day_hour'))
             return
 
         last_day = get_last_day(now)
         last_day_value = self.__db.get_historical_data(last_day)
 
         if last_day_value is None:
-            logger.info(
-                'Cotação do dia anterior não encontrada, buscando na API...')
+            logger.info(i18n.t('last_day_not_found_locally'))
             res = self.__api.get_historical_data(last_day)
             last_day_value = res[VALUE_KEY]
-            logger.info('Cotação do dia anterior R$%f. Salvando localmente.',
-                        last_day_value)
+            logger.info(i18n.t('saving_last_day_locally',
+                               value=last_day_value))
             self.__db.save_historical_data(date=last_day, value=last_day_value)
 
         last_stored_value = self.__db.get_last_stored_value()
         if last_stored_value is None:
-            logger.info('Sem dados armazenados, buscando da API...')
+            logger.info(i18n.t('no_data_stored_locally'))
             latest_data = self.__api.get_latest_data()
         else:
             existing_etag = last_stored_value[ETAG_KEY]
@@ -80,9 +78,7 @@ class DolarStatusChecker:
                                                      existing_date_header)
             if existing_etag == latest_data[ETAG_KEY] or last_stored_value[
                     VALUE_KEY] == latest_data[VALUE_KEY]:
-                logger.info(
-                    'Sem modificação no ETag ou Cotação anterior. Ignorando execução.'
-                )
+                logger.info(i18n.t('etag_or_rate_not_changed'))
                 return
 
         etag = latest_data[ETAG_KEY]
@@ -97,10 +93,15 @@ class DolarStatusChecker:
         diff_value = round(abs(last_day_value - current_value), 2)
         current_value_round = round(current_value, 2)
         if diff < self.__threshold:
-            return f'Ainda não foi dessa vez. Cotação atual: R${current_value_round} - Variação: R${diff_value} ({diff}%)'
+            return i18n.t('change_not_over_threshold',
+                          threshold=self.__threshold,
+                          current=current_value_round,
+                          diff_value=diff_value,
+                          diff_percent=diff)
 
-        logger.info(
-            'Diferença maior que o threshold configurado de %f%. Valor do dia anterior: R$%f - Valor atual: R$%f - Diferença em R$%f',
-            self.__threshold, last_day_value, current_value_round, diff_value)
-
-        return f'Atenção! A cotação do dólar subiu em relação ao dia anterior! Cotação do dia anterior: R${last_day_value}. Cotação atual: R${current_value_round} - Variação: R${diff_value} ({diff}%)'
+        return i18n.t('change_over_threshold',
+                      threshold=self.__threshold,
+                      last_value=last_day_value,
+                      current_value=current_value_round,
+                      diff_value=diff_value,
+                      diff_percent=diff)

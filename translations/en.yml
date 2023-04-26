@@ -1,0 +1,10 @@
+en:
+  checking_status: Checking status...
+  sending_message: Enviando mensagem no Telegram.
+  not_working_day_hour: Not a working day/hour. Skipping execution.
+  last_day_not_found_locally: Last day rate not found, querying the API...
+  saving_last_day_locally: Last day rate R$%{value}. Saving locally.
+  no_data_stored_locally: No data found, querying the API...
+  etag_or_rate_not_changed: No change in ETag or rate. Skipping execution.
+  change_not_over_threshold: 'Current rate have not changed more than %{threshold}%: R$%{current} - Difference: R$%{diff_value} (%{diff_percent}%)'
+  change_over_threshold: 'Attention! The rate has changed more than %{threshold}% in comparison with the last day! Last day rate: R$%{last_value}. Current rate: R$%{current_value} - Difference: R$%{diff_value} (%{diff_percent}%)'

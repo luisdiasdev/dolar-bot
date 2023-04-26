@@ -22,6 +22,7 @@ Get notified on Telegram throughout the day if USD/BRL rate is up/down by at lea
 1. Make sure to Docker and Docker Compose installed
 2. Prepare `.env` file:
   - `cp .env.example .env`
+  - Fill with your settings, more details below.
 3. Run: `docker compose up`
 
 ## Debugging
@@ -38,3 +39,4 @@ There are VSCode settings for debugging in place, just open with VSCode and make
 | `USE_MOCK_OXR_API`       | If you want to test something and don't want to use your OXR API calls, set this to `true` |
 | `RUN_INTERVAL`           | Interval in minutes which the check should run. Defaults to `25`.                          |
 | `DIFF_THRESHOLD`         | The percentage difference to trigger the alert message.                                    |
+| `APP_LOCALE`         | The locale for the application logs & messages (available values: `en,pt`).                                    |
