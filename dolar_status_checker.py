@@ -52,6 +52,7 @@ class DolarStatusChecker:
 
     def check(self) -> str | None:
         now = datetime.now(tz=timezone)
+        logger.info('Current date: %s', now)
         if not is_work_day(now.date().weekday()) or not is_work_hour(now.time().hour):
             logger.info('Not a working hour. Skipping execution.')
             return
