@@ -5,7 +5,7 @@ charset-normalizer==2.1.0
 h11==0.14.0
 httpcore==0.16.3
 httpx==0.23.3
-idna==3.3
+idna==3.7
 python-dotenv==0.20.0
 python-i18n==0.3.9
 python-telegram-bot==20.2
