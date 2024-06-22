@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   dolarbot:
     container_name: dolarbot
@@ -11,6 +9,7 @@ services:
       - dolarbot-data:/app/data
     env_file:
       - .env
+    restart: unless-stopped
 
 volumes:
   dolarbot-data:
