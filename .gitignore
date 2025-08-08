@@ -134,3 +134,6 @@ dmypy.json
 # Data directory
 data/*
 !data/.gitkeep
+
+# Dolar-Bot venv
+.dolar-bot-env*

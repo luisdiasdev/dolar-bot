@@ -8,7 +8,6 @@ import i18n
 # Environment variables
 load_dotenv()
 
-
 def get_int_from_env(env_name, default_value=None):
     env_var_value = os.getenv(env_name, default=default_value)
     if env_var_value is None or not env_var_value.isdigit():
@@ -17,7 +16,6 @@ def get_int_from_env(env_name, default_value=None):
         )
 
     return int(env_var_value)
-
 
 locale = os.getenv('APP_LOCALE', 'pt')
 use_mock_api = os.getenv('USE_MOCK_OXR_API', 'False').lower() in ('true', '1')
@@ -45,7 +43,6 @@ bot = DolarStatusChecker(
     use_mock_api=use_mock_api,  # Avoid calling real API for testing
     oxr_app_id=oxr_app_id)
 
-
 # Callback
 async def check_status(context: CallbackContext):
     logger.info(i18n.t("checking_status"))
@@ -54,15 +51,32 @@ async def check_status(context: CallbackContext):
         logger.info(i18n.t("sending_message"))
         await context.bot.send_message(chat_id=telegram_chat_id, text=result)
 
-
 def main():
-    application = Application.builder().token(telegram_token).build()
+    application = (
+        Application.builder()
+        .token(telegram_token)
+        .build()
+    )
 
     if application.job_queue is not None:
-        application.job_queue.run_repeating(check_status,
-                                            interval=60 * interval_minutes,
-                                            first=0)
+        logger.info(f"Scheduling job with interval: {interval_minutes} minutes")
+        logger.info(f"Job queue scheduler type: {type(application.job_queue.scheduler)}")
 
+        from datetime import timedelta
+
+        job = application.job_queue.run_repeating(
+            check_status,
+            interval=timedelta(minutes=interval_minutes),
+            first=timedelta(seconds=30),  # Start after 30 seconds
+            name="dolar_status_checker",
+            job_kwargs={'misfire_grace_time': 60}  # Allow 60 seconds grace time for misfires
+        )
+
+        logger.info(f"Job scheduled successfully: {job}")
+    else:
+        logger.error("Job queue is not available!")
+
+    logger.info("Starting bot polling...")
     application.run_polling()
 
 
