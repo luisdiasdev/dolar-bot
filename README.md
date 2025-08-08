@@ -19,17 +19,43 @@ Get notified on Telegram throughout the day if USD/BRL rate is up/down by at lea
 
 ## Running
 
-1. Make sure to Docker and Docker Compose installed
-2. Prepare `.env` file:
-  - `cp .env.example .env`
-  - Fill with your settings, more details below.
-3. Run: `docker compose up`
+1. Create Python Virtual Environment for dependencies:
+
+```shell
+python3 -m venv .dolar-bot-env
+source ././dolar-bot-env/bin/activate
+```
+
+2. Install dependencies
+
+```shell
+pip install -r requirements.txt
+```
+
+3. Run app
+
+```shell
+python main.py
+```
+
+## Development
+
+### Setup Pre-Commit
+
+```shell
+pip install pre-commit
+pre-commit install
+```
 
 ## Debugging
 
-There are VSCode settings for debugging in place, just open with VSCode and make sure to have Docker Plugin.
+### Using VSCode
 
-### Environment variables
+1. Select Python Interpreter from the Virtual Environment: `Command Pallete -> Python: Select Interpeter`.
+
+2. Open `main.py` and use the `Python Debugger: Current File` Launch Config.
+
+## Environment variables
 
 | **Environment Variable** | **Description**                                                                            |
 |--------------------------|--------------------------------------------------------------------------------------------|
